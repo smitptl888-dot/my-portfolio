@@ -1,4 +1,6 @@
 import { sites } from "@openai/sites-vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
+import { nitro } from "nitro/vite";
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
@@ -33,9 +35,24 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
+  // Vercel production builds use Nitro's platform adapter. Keeping the
+  // Cloudflare plugin out of this path prevents it from taking ownership of
+  // Vinext's RSC and SSR build environments.
+  const isVercelBuild =
+    command === "build" ||
+    process.env.VERCEL === "1" ||
+    process.env.NITRO_PRESET === "vercel";
+
+  if (isVercelBuild) {
+    return {
+      plugins: [vinext(), tailwindcss(), nitro()],
+    };
+  }
+
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
-  // settings; application environment belongs in ignored `.env*` files.
+  // settings used by the existing Codex/Sites local preview only; application
+  // environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
   process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";
   process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";

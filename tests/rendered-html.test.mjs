@@ -3,23 +3,17 @@ import { access } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", process.pid + "-" + Date.now());
-  const { default: worker } = await import(workerUrl.href);
+  const serverUrl = new URL(
+    "../.vercel/output/functions/__server.func/index.mjs",
+    import.meta.url,
+  );
+  serverUrl.searchParams.set("test", process.pid + "-" + Date.now());
+  const { default: server } = await import(serverUrl.href);
 
-  return worker.fetch(
-    new Request("http://localhost/", {
+  return server.fetch(
+    new Request("https://portfolio.example/", {
       headers: { accept: "text/html", host: "localhost" },
     }),
-    {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
   );
 }
 
