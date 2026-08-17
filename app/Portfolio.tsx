@@ -1,393 +1,166 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
-import {
-  categories,
-  projects,
-  services,
-  siteDetails,
-  tools,
-  type Project,
-} from "./portfolio-data";
+/* eslint-disable @next/next/no-img-element -- Local portfolio artwork is already optimized and must preserve its original crops. */
 
-function ProjectVisual({ project, large = false }: { project: Project; large?: boolean }) {
-  return (
-    <div className={`project-visual tone-${project.tone} ${large ? "visual-large" : ""}`}>
-      <div className="visual-grid" />
-      <span className="visual-kicker">{project.kicker}</span>
-      <div className="visual-object"><i /><i /><b>{String(project.id).padStart(2, "0")}</b></div>
-      <strong>{project.headline.split("\n").map((line) => <span key={line}>{line}</span>)}</strong>
-      <small>CONCEPT PROJECT</small>
-    </div>
-  );
+import Link from "next/link";
+import { useEffect, useState, type PointerEvent as ReactPointerEvent } from "react";
+import RadialPosterStage from "./components/RadialPosterStage";
+import SoftwareTube from "./components/SoftwareTube";
+import StudioHeader from "./components/StudioHeader";
+import { aiCreativeCapabilities, categories, process, services, siteDetails, visualSkills } from "./portfolio-data";
+
+function CornerMarks() {
+  return <span className="corner-marks" aria-hidden="true"><i /><i /><i /><i /></span>;
 }
 
 export default function Portfolio() {
-  const [activeCategory, setActiveCategory] = useState("All work");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const modalCloseRef = useRef<HTMLButtonElement>(null);
+  const [introVisible, setIntroVisible] = useState(true);
 
   useEffect(() => {
-    if (selectedProject) modalCloseRef.current?.focus();
-  }, [selectedProject]);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((element) => element.setAttribute("data-visible", "true"));
+      return;
+    }
 
-  const filteredProjects =
-    activeCategory === "All work"
-      ? projects
-      : projects.filter((project) => project.category === activeCategory);
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.setAttribute("data-visible", "true");
+          observer.unobserve(entry.target);
+        }
+      }),
+      { rootMargin: "0px 0px -8%", threshold: 0.1 },
+    );
 
-  function closeMenu() {
-    setMenuOpen(false);
-  }
+    document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const subject = `Portfolio inquiry — ${String(formData.get("service") || "Design project")}`;
-    const body = [
-      `Name: ${formData.get("name")}`,
-      `Email: ${formData.get("email")}`,
-      `Brand: ${formData.get("brand") || "Not provided"}`,
-      `Service: ${formData.get("service")}`,
-      `Budget: ${formData.get("budget")}`,
-      `Timeline: ${formData.get("timeline") || "Flexible"}`,
-      "",
-      String(formData.get("details") || ""),
-    ].join("\n");
-    setSubmitted(true);
-    window.location.href = `mailto:${siteDetails.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  function moveHero(event: ReactPointerEvent<HTMLElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--pointer-x", `${((event.clientX - rect.left) / rect.width - 0.5) * 2}`);
+    event.currentTarget.style.setProperty("--pointer-y", `${((event.clientY - rect.top) / rect.height - 0.5) * 2}`);
   }
 
   return (
-    <main>
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="Smit portfolio home" onClick={closeMenu}>
-          <span className="brand-mark">SP</span>
-          <span>Smit / Visual Designer</span>
-        </a>
-        <button
-          className="menu-button"
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="primary-nav"
-          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span /><span />
-        </button>
-        <nav id="primary-nav" className={menuOpen ? "nav-open" : ""} aria-label="Primary navigation">
-          <a href="#work" onClick={closeMenu}>Work</a>
-          <a href="#services" onClick={closeMenu}>Services</a>
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#toolkit" onClick={closeMenu}>Toolkit</a>
-          <a className="nav-cta" href="#contact" onClick={closeMenu}>Start a project</a>
-        </nav>
-      </header>
-
-      <section className="hero" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow"><span /> Independent graphic designer · Available worldwide</p>
-          <h1>Bold visuals.<br /><em>Clear impact.</em></h1>
-          <p className="hero-intro">
-            I design attention-grabbing campaigns, product stories and social
-            content that make brands impossible to scroll past.
-          </p>
-          <div className="hero-actions">
-            <a className="button button-primary" href="#work">Explore my work <span>↗</span></a>
-            <a className="button button-ghost" href="#contact">Let&apos;s work together</a>
-          </div>
-          <div className="hero-meta" aria-label="Design specialties">
-            <div className="hero-meta-label">
-              <small>Design specialties</small>
-              <b>Selected focus</b>
-            </div>
-            <div className="hero-meta-list">
-              <span><i aria-hidden="true" />Meta Ads</span>
-              <span><i aria-hidden="true" />Product Listings</span>
-              <span><i aria-hidden="true" />Social Creatives</span>
-              <span><i aria-hidden="true" />Campaigns</span>
-            </div>
-            <strong className="hero-meta-mark" aria-hidden="true">✦</strong>
-          </div>
+    <main id="top" className="mondragon-portfolio home-focused">
+      {introVisible ? (
+        <div className="opening-sequence" aria-hidden="true" onAnimationEnd={(event) => { if (event.currentTarget === event.target) setIntroVisible(false); }}>
+          <div className="opening-logo"><span>S</span><i /><span>P</span></div>
+          <p>Graphic design / Visual direction</p>
+          <div className="opening-word"><span>SMIT</span><span>PATEL</span></div>
         </div>
+      ) : null}
 
-        <div className="hero-stage" aria-label="Selected design work preview">
-          <div className="orb orb-one" /><div className="orb orb-two" />
-          <article className="art-card card-main">
-            <div className="art-label">01 / META CAMPAIGN</div>
-            <div className="product-orbit"><span>GLOW</span></div>
-            <div className="art-title">YOUR SKIN<br />BUT BRIGHTER.</div>
-            <div className="art-chip">SHOP THE DROP →</div>
-          </article>
-          <article className="art-card card-side">
-            <div className="art-label">02 / PRODUCT STORY</div>
-            <div className="earbud-shape"><i /><i /></div>
-            <strong>NOISE OFF.<br />WORLD ON.</strong>
-          </article>
-          <article className="glass-note">
-            <span>Selected work</span><strong>2024—26</strong><small>Campaigns that look sharp and communicate faster.</small>
-          </article>
-          <div className="floating-tag">DESIGN / DIRECTION / DELIVERY</div>
-        </div>
+      <StudioHeader current="home" />
+
+      <section className="studio-hero" aria-labelledby="hero-title" onPointerMove={moveHero}>
+        <CornerMarks />
+        <p className="hero-location">{siteDetails.location}<span>✦</span></p>
+        <h1 id="hero-title"><span>SMIT</span><span>PATEL</span></h1>
+        <RadialPosterStage />
+        <div className="hero-specialties"><span>Design specialist</span><p>Graphic Designer</p><p>Visual Designer</p><p>Creative Direction</p></div>
+        <Link className="hero-contact-card" href="/contact"><span>Hi!<br />I&apos;m Smit.</span><img src="/portfolio/smit-patel-profile-2026.jpg" alt="Smit Patel" /><strong>Contact me<br />for design projects</strong></Link>
+        <a className="scroll-cue" href="#studio-intro">Scroll Down<i aria-hidden="true">⌄</i></a>
       </section>
 
-      <div className="discipline-strip" aria-label="Design services">
-        <div>
-          META ADS <b>✦</b> PRODUCT LISTINGS <b>✦</b> SOCIAL MEDIA <b>✦</b> BANNERS <b>✦</b> THUMBNAILS <b>✦</b> CAMPAIGN DESIGN <b>✦</b>
-          META ADS <b>✦</b> PRODUCT LISTINGS <b>✦</b> SOCIAL MEDIA <b>✦</b> BANNERS <b>✦</b> THUMBNAILS <b>✦</b> CAMPAIGN DESIGN <b>✦</b>
-        </div>
+      <div className="client-strip" aria-label="Design specialties">
+        <div>{categories.slice(1).map((category) => <span key={category}>{category}</span>)}</div>
+        <div aria-hidden="true">{categories.slice(1).map((category) => <span key={category}>{category}</span>)}</div>
       </div>
 
-      <section className="section work-section" id="work">
-        <div className="section-heading">
-          <div>
-            <p className="section-index">01 / SELECTED WORK</p>
-            <h2>Campaigns with<br /><em>a point of view.</em></h2>
-          </div>
-          <p>Concept-led work across performance creative, e-commerce, social systems and digital campaigns.</p>
-        </div>
+      <section className="studio-statement" id="studio-intro">
+        <CornerMarks />
+        <p data-reveal>I shape clear ideas into bold visual systems for brands, campaigns, social content, and print.</p>
+        <div className="statement-meta"><span>Graphic Designer / Visual Designer</span><span>Digital + Print</span></div>
+      </section>
 
-        <div className="filter-bar" role="toolbar" aria-label="Filter portfolio projects">
-          {categories.map((category) => (
-            <button
-              type="button"
-              key={category}
-              className={activeCategory === category ? "active" : ""}
-              aria-pressed={activeCategory === category}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+      <section className="identity-motion" aria-label="Smit Patel design roles">
+        <div><span>GRAPHIC DESIGNER</span><i>✦</i><span>GRAPHIC DESIGNER</span><i>✦</i></div>
+        <div><span>VISUAL DESIGNER</span><i>✦</i><span>VISUAL DESIGNER</span><i>✦</i></div>
+        <div><span>DESIGN SPECIALIST</span><i>✦</i><span>DESIGN SPECIALIST</span><i>✦</i></div>
+      </section>
 
-        <div className="project-grid">
-          {filteredProjects.map((project) => (
-            <button
-              type="button"
-              className="project-card"
-              key={project.id}
-              onClick={() => setSelectedProject(project)}
-              aria-label={`Open ${project.title} concept case study`}
-            >
-              <ProjectVisual project={project} />
-              <span className="project-info">
-                <span><b>{project.title}</b><small>{project.brand} · Concept Project</small></span>
-                <span><small>{project.category}</small><b>{project.year} ↗</b></span>
-              </span>
-            </button>
+      <section className="software-showcase" id="skills">
+        <CornerMarks />
+        <div className="software-heading" data-reveal>
+          <p>Creative toolkit / 10 tools</p>
+          <h2>SOFTWARE<br /><em>EXPERTISE</em></h2>
+          <span>Clear tools.<br />Stronger visual outcomes.</span>
+        </div>
+        <div data-reveal><SoftwareTube /></div>
+        <p className="software-footnote" data-reveal><span>Tools in service of the idea</span>A flexible toolkit supports the process from first direction to polished digital, social, video, and print delivery.</p>
+      </section>
+
+      <section className="services-studio" id="services">
+        <div className="services-intro" data-reveal><p>Design specialties</p><h2>Visual support<br />for every <em>launch.</em></h2></div>
+        <div className="services-rows">
+          {services.map(([number, title, description]) => (
+            <Link href="/contact" key={title} data-reveal><span>{number}</span><h3>{title}</h3><p>{description}</p><i aria-hidden="true">↗</i><b aria-hidden="true" /></Link>
           ))}
         </div>
       </section>
 
-      <section className="section campaign-lab">
-        <div className="section-heading compact">
-          <div>
-            <p className="section-index">02 / PERFORMANCE CREATIVE</p>
-            <h2>One idea.<br /><em>Built to flex.</em></h2>
-          </div>
-          <p>A campaign system that can move from bold awareness to clear product benefits and offer-led creative.</p>
+      <section className="ai-creative" id="ai-creative">
+        <CornerMarks />
+        <div className="ai-creative-heading" data-reveal>
+          <p>AI-assisted creative / Visual production</p>
+          <h2>FASTER<br /><em>EXPLORATION.</em><br />HUMAN DIRECTION.</h2>
         </div>
-        <div className="ad-lab-grid">
-          <article className="ad-tile ad-one"><span>01 / AWARENESS</span><div className="ad-product">LUMA</div><strong>GLOW<br />FORWARD.</strong><small>NEW FORMULA</small></article>
-          <article className="ad-tile ad-two"><span>02 / BENEFIT</span><div className="ad-bubbles"><i /><i /><i /></div><strong>3× HYDRATION.<br />ZERO HEAVINESS.</strong><small>CLINICALLY TESTED*</small></article>
-          <article className="ad-tile ad-three"><span>03 / OFFER</span><div className="ad-ring">20%</div><strong>YOUR ROUTINE,<br />UPGRADED.</strong><small>CONCEPT CREATIVE</small></article>
-        </div>
-        <p className="concept-note">*Demonstration copy for a fictional concept brand. No performance or clinical claims are presented as real.</p>
-      </section>
-
-      <section className="section listing-story">
-        <div className="section-heading light-heading">
-          <div>
-            <p className="section-index">03 / E-COMMERCE STORYTELLING</p>
-            <h2>A listing that<br /><em>answers before asked.</em></h2>
-          </div>
-          <p>Every frame has a job: attract, explain, reassure and help the customer compare.</p>
-        </div>
-        <div className="listing-track">
-          {[
-            ["01", "HERO", "See the product clearly"],
-            ["02", "BENEFITS", "Understand the value fast"],
-            ["03", "FEATURES", "Turn specs into outcomes"],
-            ["04", "LIFESTYLE", "Picture it in real life"],
-            ["05", "COMPARE", "Make the choice easier"],
-            ["06", "IN THE BOX", "Know exactly what arrives"],
-          ].map(([number, title, text]) => (
-            <article key={number}>
-              <span>{number}</span><div className={`listing-object object-${number}`}><i /><b /></div><strong>{title}</strong><p>{text}</p>
-            </article>
-          ))}
+        <div className="ai-orbit" aria-hidden="true"><i /><i /><i /><b>AI</b><span>IDEA</span><span>IMAGE</span><span>VARIATION</span></div>
+        <div className="ai-creative-copy" data-reveal>
+          <p>I use AI inside the graphic-design workflow to explore visual directions, generate possibilities, and test ideas faster—then refine the strongest direction through hands-on design.</p>
+          <div>{aiCreativeCapabilities.map((capability, index) => <span key={capability}><small>{String(index + 1).padStart(2, "0")}</small>{capability}</span>)}</div>
         </div>
       </section>
 
-      <section className="section services-section" id="services">
-        <div className="section-heading">
-          <div>
-            <p className="section-index">04 / SERVICES</p>
-            <h2>Design support<br /><em>where it matters.</em></h2>
-          </div>
-          <p>Focused visual design for launches, daily marketing and the moments when your brand needs more attention.</p>
-        </div>
-        <div className="services-grid">
-          {services.map((service) => (
-            <article className="service-card" key={service.number}>
-              <span>{service.number}</span>
-              <h3>{service.title}</h3>
-              <p>{service.text}</p>
-              <div>{service.tags.map((tag) => <small key={tag}>{tag}</small>)}</div>
-              <a href="#contact" aria-label={`Inquire about ${service.title}`}>Discuss this service <b>↗</b></a>
-            </article>
-          ))}
-        </div>
+      <section className="proof-strip focus-strip" aria-label="Design focus">
+        <article data-reveal><span>·</span><strong>Graphic<br />Designer</strong><p>Bold, readable visual communication.</p></article>
+        <article data-reveal><span>··</span><strong>Visual<br />Designer</strong><p>Clear systems for digital and print.</p></article>
+        <article data-reveal><span>···</span><strong>Design<br />Specialist</strong><p>Campaign, social, brand, and layout work.</p></article>
       </section>
 
-      <section className="section toolkit-section" id="toolkit">
-        <div className="section-heading compact">
-          <div>
-            <p className="section-index">05 / CREATIVE TOOLKIT</p>
-            <h2>Ideas are the point.<br /><em>Tools make them real.</em></h2>
-          </div>
-          <p>A flexible production toolkit for image-making, layouts, brand systems and campaign delivery.</p>
-        </div>
-        <div className="tools-grid">
-          {tools.map(([mark, name, detail], index) => (
-            <article className="tool-card" key={name}>
-              <span className="tool-mark">{mark}</span>
-              <span><b>{name}</b><small>{detail}</small></span>
-              <i>{String(index + 1).padStart(2, "0")}</i>
-            </article>
-          ))}
-        </div>
-        <p className="tool-note">Software cards are editable and should be adjusted to match verified proficiency before publication.</p>
+      <section className="about-studio" id="about">
+        <CornerMarks />
+        <div className="about-studio-heading" data-reveal><p>About Smit</p><h2>Designing clear ideas with a bold visual point of view.</h2></div>
+        <figure className="about-portrait" data-reveal><img src="/portfolio/smit-patel-profile-2026.jpg" alt="Portrait of Smit Patel, graphic designer" /><figcaption>Smit Patel / Graphic Designer</figcaption></figure>
+        <div className="about-studio-copy" data-reveal><p>Smit creates poster systems, brand visuals, social creatives, and campaign artwork that feels clean, confident, and ready to use.</p><div>{visualSkills.map((skill) => <span key={skill}>{skill}</span>)}</div><Link href="/services">Explore services <i aria-hidden="true">↗</i></Link></div>
       </section>
 
-      <section className="section process-section">
-        <div className="section-heading">
-          <div>
-            <p className="section-index">06 / PROCESS</p>
-            <h2>Clear steps.<br /><em>Better outcomes.</em></h2>
-          </div>
-          <p>A collaborative process designed to keep the idea strong and the delivery straightforward.</p>
-        </div>
-        <div className="process-line">
-          {[
-            ["01", "Discover", "Goals, audience, formats and what success should look like."],
-            ["02", "Define", "A focused visual direction and clear hierarchy for the message."],
-            ["03", "Design", "Exploration, systems and polished creative across key formats."],
-            ["04", "Refine", "Focused feedback rounds that improve the work without diluting it."],
-            ["05", "Deliver", "Organised, production-ready files for every agreed placement."],
-          ].map(([number, title, text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}
-        </div>
+      <section className="process-studio" id="process">
+        <p className="process-label">Design process</p>
+        <div>{process.map(([number, title, description]) => <article key={number} data-reveal><span>{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div>
       </section>
 
-      <section className="section about-section" id="about">
-        <div className="about-portrait" aria-label="Abstract portrait placeholder ready to replace with Smit's photo">
-          <div className="portrait-glow" /><span>PORTRAIT<br />COMING SOON</span><i>SMIT / DESIGNER</i>
-        </div>
-        <div className="about-copy">
-          <p className="section-index">07 / ABOUT</p>
-          <h2>Curious mind.<br /><em>Sharp eye.</em></h2>
-          <p className="about-lead">
-            I&apos;m Smit, an independent graphic designer focused on turning
-            marketing messages into visual ideas people notice and understand.
-          </p>
-          <p>
-            My work lives where brand, campaign and performance creative meet:
-            from product listings and Meta ads to social systems, banners and
-            thumbnails. I care about strong hierarchy, thoughtful details and
-            files that are genuinely useful after delivery.
-          </p>
-          <div className="about-facts">
-            <span><small>FOCUS</small>Digital campaigns & e-commerce</span>
-            <span><small>WORKING STYLE</small>Clear, collaborative, detail-led</span>
-            <span><small>AVAILABILITY</small>Freelance & remote projects</span>
-          </div>
-          <a className="text-link" href="#contact">Have a project in mind? Let&apos;s talk <b>↗</b></a>
-        </div>
+      <section className="home-contact-cta">
+        <CornerMarks />
+        <div className="home-cta-copy"><p>Have a design project in mind?</p><h2>LET&apos;S<br />WORK!</h2><Link href="/contact">Contact <span>↗</span></Link></div>
+        <div className="home-cta-motion" aria-hidden="true"><i /><i /><i /><b>SP</b><span>Graphic design · Visual direction · </span></div>
       </section>
 
-      <section className="section contact-section" id="contact">
-        <div className="contact-intro">
-          <p className="section-index">08 / START A PROJECT</p>
-          <h2>Let&apos;s make<br /><em>something noticed.</em></h2>
-          <p>Tell me what you&apos;re building, what you need and where the design needs to work.</p>
-          <a href={`mailto:${siteDetails.email}`}>{siteDetails.email} <span>↗</span></a>
-          <div className="contact-status"><i /> Currently open to selected freelance projects</div>
-        </div>
-        <form className="inquiry-form" onSubmit={handleSubmit}>
-          <div className="field-row">
-            <label>Your name<input name="name" autoComplete="name" required placeholder="Your full name" /></label>
-            <label>Email address<input name="email" type="email" autoComplete="email" required placeholder="you@company.com" /></label>
+      <footer className="studio-footer">
+        <CornerMarks />
+        <div className="footer-motion" role="img" aria-label="A playful kinetic design character in motion">
+          <div className="footer-playground" aria-hidden="true">
+            <span className="footer-play-ball footer-play-ball-one" />
+            <span className="footer-play-ball footer-play-ball-two" />
+            <b className="footer-play-creature"><i /><i /><em /></b>
+            <strong>✦</strong>
+            <span className="footer-play-squiggle" />
           </div>
-          <label>Company or brand<input name="brand" autoComplete="organization" placeholder="Optional" /></label>
-          <div className="field-row">
-            <label>Service needed
-              <select name="service" required defaultValue="">
-                <option value="" disabled>Select a service</option>
-                <option>Meta Ads</option><option>Product Listing Images</option><option>Social Media Design</option>
-                <option>Banners & Campaigns</option><option>YouTube Thumbnails</option><option>Custom Design Support</option>
-              </select>
-            </label>
-            <label>Estimated budget
-              <select name="budget" required defaultValue="">
-                <option value="" disabled>Select a range</option>
-                <option>Let&apos;s discuss</option><option>Under ₹10,000</option><option>₹10,000–₹25,000</option>
-                <option>₹25,000–₹50,000</option><option>₹50,000+</option>
-              </select>
-            </label>
+          <div className="footer-motion-sweep" aria-hidden="true">
+            <span>MOVE ✦ MIX ✦ MAKE ✦ PLAY ✦ </span>
+            <span>MOVE ✦ MIX ✦ MAKE ✦ PLAY ✦ </span>
           </div>
-          <label>Desired timeline<input name="timeline" placeholder="For example: within 3 weeks" /></label>
-          <label>Project details<textarea name="details" required rows={5} placeholder="Share the goal, required formats and anything else that will help..." /></label>
-          <label className="consent"><input type="checkbox" required /> <span>I agree to be contacted about this project. No information will be shared with third parties.</span></label>
-          <button className="submit-button" type="submit">Create email inquiry <span>↗</span></button>
-          {submitted && <p className="form-success" role="status">Your email app should now open with the inquiry details prepared.</p>}
-        </form>
-      </section>
-
-      <footer>
-        <a className="brand" href="#top"><span className="brand-mark">SP</span><span>Smit / Visual Designer</span></a>
-        <p>Meta Ads · Product Listings · Social Media · Campaign Design</p>
-        <div>
-          <a href={`mailto:${siteDetails.email}`}>Email</a>
-          {siteDetails.instagramUrl && <a href={siteDetails.instagramUrl} target="_blank" rel="noreferrer">Instagram</a>}
-          <a href="#top">Back to top ↑</a>
+          <small aria-hidden="true">CREATIVE PLAYGROUND / 2026</small>
         </div>
-        <small>© {new Date().getFullYear()} Smit. Concept projects are clearly labelled.</small>
+        <p>GRAPHIC DESIGNER / VISUAL CREATIVE</p>
+        <nav aria-label="Footer navigation"><Link href="/">Home</Link><i>·</i><Link href="/services">Services</Link><i>·</i><Link href="/work">Work</Link><i>·</i><Link href="/contact">Contact</Link></nav>
+        <small>© 2026 Smit Patel. All rights reserved.</small>
       </footer>
 
-      {siteDetails.whatsappUrl && (
-        <a className="whatsapp-button" href={siteDetails.whatsappUrl} target="_blank" rel="noreferrer" aria-label="Contact Smit on WhatsApp">
-          <span>WA</span> Let&apos;s chat
-        </a>
-      )}
-
-      {selectedProject && (
-        <dialog
-          open
-          className="project-modal"
-          aria-labelledby="project-modal-title"
-          onCancel={() => setSelectedProject(null)}
-        >
-          <div className="modal-panel">
-            <button ref={modalCloseRef} className="modal-close" type="button" onClick={() => setSelectedProject(null)} aria-label="Close case study">Close ×</button>
-            <ProjectVisual project={selectedProject} large />
-            <div className="modal-copy">
-              <p className="section-index">{selectedProject.category} / {selectedProject.year}</p>
-              <h2 id="project-modal-title">{selectedProject.title}</h2>
-              <p className="modal-lead">{selectedProject.summary}</p>
-              <div className="modal-columns">
-                <div><small>THE CHALLENGE</small><p>Create a visual system that communicates quickly across different placements while keeping one recognisable campaign idea.</p></div>
-                <div><small>THE APPROACH</small><p>Use strong hierarchy, a tight palette and modular layouts so every format feels connected without becoming repetitive.</p></div>
-              </div>
-              <div className="deliverable-list">{selectedProject.deliverables.map((item) => <span key={item}>{item}</span>)}</div>
-              <p className="concept-note">This is a self-initiated concept project created to demonstrate design thinking and execution.</p>
-              <a className="button button-primary" href="#contact" onClick={() => setSelectedProject(null)}>Start a similar project ↗</a>
-            </div>
-          </div>
-        </dialog>
-      )}
+      <Link className="floating-whatsapp" href="/contact" aria-label="Open the contact page"><span>SP</span>Contact</Link>
     </main>
   );
 }

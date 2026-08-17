@@ -1,9 +1,9 @@
 # Smit — Graphic Design Portfolio
 
-A responsive portfolio for an independent graphic designer, built with React,
-TypeScript, vinext and Vite. The site includes filtered concept work, campaign
-showcases, services, a software toolkit, process, about and an email-based
-inquiry form.
+A responsive editorial portfolio for graphic designer Smit Patel, built with
+React, TypeScript, Vinext and Vite. The site includes 24 real portfolio visuals,
+category filtering, an immersive project viewer, services, toolkit, process,
+About route, WhatsApp contact and an email-based inquiry form.
 
 ## Local development
 
@@ -32,13 +32,10 @@ pnpm test
 Edit app/portfolio-data.ts to update:
 
 - name and professional title
-- email and location
-- WhatsApp URL
-- Instagram URL
-- projects, services and software
+- email, phone and availability
+- WhatsApp and Instagram URLs
+- projects, categories, services and software
 
-Empty WhatsApp and Instagram values intentionally keep those public links
-hidden until valid URLs are supplied.
-
-All demo projects are labelled as concept work and make no real client or
-performance claims.
+Portfolio artwork is stored in `public/portfolio`. Project records support
+optional year, client and brand fields plus hero and gallery image arrays, so
+future case studies can be expanded without changing the page structure.

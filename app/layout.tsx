@@ -12,24 +12,37 @@ export async function generateMetadata(): Promise<Metadata> {
     incomingHeaders.get("x-forwarded-proto") ??
     (host.startsWith("localhost") ? "http" : "https");
   const ogImage = `${protocol}://${host}/og.png`;
-  const title = "Smit — Graphic Designer & Visual Creative";
+  const canonicalUrl = `${protocol}://${host}/`;
+  const title = "Smit Patel | Graphic Designer Portfolio";
   const description =
-    "Independent graphic designer creating Meta ads, product listing images, social media campaigns, banners and thumbnails.";
+    "Explore the graphic design portfolio of Smit Patel, featuring poster designs, brand identity, social media creatives, campaign visuals, and digital artwork.";
 
   return {
     title,
     description,
-    icons: { icon: "/favicon.svg" },
+    keywords: [
+      "Smit Patel graphic designer",
+      "graphic designer portfolio",
+      "poster design",
+      "brand identity design",
+      "social media creatives",
+      "campaign design",
+      "visual designer",
+    ],
+    icons: { icon: "/logo.png" },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
-      description,
+      description: "Explore poster designs, brand identity, social media creatives, campaign visuals, and digital artwork by Smit Patel.",
       type: "website",
+      url: canonicalUrl,
+      siteName: "Smit Patel Portfolio",
       images: [{ url: ogImage, width: 1733, height: 909, alt: "Smit visual designer portfolio" }],
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description,
+      description: "Poster designs, brand identity, social media creatives, campaign visuals, and digital artwork by Smit Patel.",
       images: [ogImage],
     },
   };
