@@ -91,8 +91,9 @@ export default function RadialPosterStage() {
       // Keep every card on one compact, connected loop. The full-turn spacing
       // is derived from the artwork count so adding or replacing creatives does
       // not break the composition.
-      const radiusX = stage.clientWidth * 0.205;
-      const radiusY = stage.clientHeight * 0.225;
+      const isDesktop = window.innerWidth > 1050;
+      const radiusX = stage.clientWidth * (isDesktop ? 0.285 : 0.205);
+      const radiusY = stage.clientHeight * (isDesktop ? 0.265 : 0.225);
       const loopGap = (Math.PI * 2) / cards.length;
 
       cards.forEach((card, index) => {
