@@ -61,6 +61,13 @@ export default defineConfig(async ({ command }) => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    // Vinext's browser navigation imports these public build-time flags.
+    // Define only these values; never expose the server's process.env object.
+    define: {
+      "process.env.__NEXT_APP_NAV_FAIL_HANDLING": "false",
+      "process.env.__VINEXT_DEPLOYMENT_ID": '""',
+      "process.env.NEXT_DEPLOYMENT_ID": '""',
+    },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,

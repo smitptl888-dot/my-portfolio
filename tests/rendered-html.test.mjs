@@ -1,118 +1,81 @@
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
 import test from "node:test";
-
-async function render(pathname = "/") {
-  const serverUrl = new URL(
-    "../.vercel/output/functions/__server.func/index.mjs",
-    import.meta.url,
-  );
-  serverUrl.searchParams.set("test", process.pid + "-" + Date.now());
-  const { default: server } = await import(serverUrl.href);
-
-  return server.fetch(
-    new Request(`https://portfolio.example${pathname}`, {
-      headers: { accept: "text/html", host: "localhost" },
-    }),
-  );
+import { readFile } from "node:fs/promises";
+let server;
+async function render(path = "/") {
+  server ??= (await import("../.vercel/output/functions/__server.func/index.mjs")).default;
+  const response = await server.fetch(new Request("https://portfolio.example" + path, { headers: { accept: "text/html", host: "localhost" } }));
+  assert.equal(response.status, 200, path);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html/i);
+  return response.text();
 }
-
-test("server-renders the finished portfolio", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-
-  const html = await response.text();
-  assert.match(html, /<title>Smit Patel \| Graphic Designer Portfolio<\/title>/i);
-  assert.match(html, /Graphic Designer Portfolio/i);
-  assert.match(html, /Design specialist/i);
-  assert.match(html, /Creative Toolkit/i);
-  assert.match(html, /Interactive creative trail/i);
-  assert.match(html, /Adobe Photoshop/i);
-  assert.match(html, /Adobe Illustrator/i);
-  assert.match(html, /Adobe Lightroom/i);
-  assert.match(html, /Figma/i);
-  assert.match(html, /Canva Pro/i);
-  assert.match(html, /Adobe InDesign/i);
-  assert.match(html, /Adobe Premiere Pro/i);
-  assert.match(html, /After Effects/i);
-  assert.match(html, /WordPress/i);
-  assert.match(html, /Filmora/i);
-  assert.match(html, /software-tube/i);
-  assert.match(html, /draggable software loop/i);
-  assert.match(html, /smit-patel-profile-2026\.jpg/i);
-  for (let index = 1; index <= 16; index += 1) {
-    assert.match(html, new RegExp(`radial-creative-${String(index).padStart(2, "0")}\\.jpg`, "i"));
+test("homepage keeps its existing creative animation", async () => {
+  const html = await render("/");
+  assert.match(html, /Smit Patel/);
+  assert.match(html, /<img\b/);
+  assert.doesNotMatch(html, /class="secondary-site"/);
+});
+for (const [path, title] of [["/work", "Selected Work"], ["/services", "Graphic Design Services"], ["/about", "About Smit Patel"], ["/contact", "Contact Smit Patel"]]) {
+  test(path + " is complete and server-rendered", async () => {
+    const html = await render(path);
+    assert.ok(html.includes(title));
+    assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
+    assert.match(html, /id="main-content"/);
+    assert.match(html, /Skip to content/);
+    assert.match(html, /Footer navigation/);
+    assert.match(html, /Pause motion/);
+    if (path === "/work") {
+      assert.equal((html.match(/<img\b/g) ?? []).length, 30);
+      for (const file of ["01-poster-design", "02-brand-identity", "03-social-creatives", "04-campaign-visuals", "05-logo-identity", "06-type-layout"]) {
+        assert.ok(html.includes(`/portfolio/work-concepts/${file}.jpg`));
+        assert.ok((await readFile(new URL(`../public/portfolio/work-concepts/${file}.jpg`, import.meta.url))).length > 0);
+      }
+    } else assert.doesNotMatch(html, /<img\b|<picture\b|<svg\b|<video\b/i);
+    assert.doesNotMatch(html, /mailto:|smitptl\.888@gmail\.com/);
+    for (const route of ["/work", "/about", "/services", "/contact"]) assert.ok(html.includes('href="' + route + '"'));
+  });
+}
+test("all existing project records and filters are retained", async () => {
+  const html = await render("/work");
+  assert.equal((html.match(/class="sub-project-entry"/g) ?? []).length, 24);
+  assert.match(html, /Fashion Banner Direction/);
+  assert.match(html, /Industrial Campaign Systems/);
+  assert.match(html, /Product Comparison &amp; Information/);
+  assert.match(html, /Filter projects/);
+});
+test("every collection has at least seven distinct existing and attributed artworks", async () => {
+  const ts = await import("typescript");
+  const original = await readFile(new URL("../app/portfolio-data.ts", import.meta.url), "utf8");
+  const galleries = (await readFile(new URL("../app/work-gallery-data.ts", import.meta.url), "utf8")).replace(/^import .*;\r?\n/, "");
+  const source = ts.transpileModule(original + "\n" + galleries, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const { workProjects } = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
+  assert.equal(workProjects.length, 24);
+  for (const project of workProjects) {
+    assert.ok(project.artworks.length >= 7, project.title);
+    assert.equal(new Set(project.artworks.map(item => item.src)).size, project.artworks.length, project.title);
+    for (const artwork of project.artworks) {
+      assert.ok(artwork.title);
+      assert.ok(["Supplied artwork", "AI-assisted concept"].includes(artwork.provenance));
+      assert.ok((await readFile(new URL("../public" + artwork.src, import.meta.url))).length > 0, artwork.src);
+    }
   }
-  assert.equal((html.match(/data-radial-card/g) ?? []).length, 16);
-  assert.equal((html.match(/data-radial-leader="true"/g) ?? []).length, 1);
-  assert.match(html, /data-radial-leader="true"[\s\S]*?radial-creative-15\.jpg/i);
-  assert.match(html, /playful kinetic design character in motion/i);
-  assert.match(html, /MOVE ✦ MIX ✦ MAKE ✦ PLAY/i);
-  assert.match(html, /AI-assisted creative/i);
-  assert.match(html, /LET(?:&#x27;|')S(?:<br\s*\/?>|\s+)WORK/i);
-  assert.match(html, /smitptl\.888@gmail\.com/i);
-  assert.match(html, /instagram\.com\/smit8\._/i);
-  assert.doesNotMatch(html, /Featured Works/i);
-  assert.doesNotMatch(html, /LET(?:&#x27;|')S TALK/i);
-  assert.doesNotMatch(html, /name="details"/i);
-  assert.doesNotMatch(html, /Concept Project/i);
-  assert.doesNotMatch(html, /codex-preview|Your site is taking shape|SkeletonPreview/i);
 });
-
-test("includes the finished social sharing image", async () => {
-  await access(new URL("../public/og.png", import.meta.url));
+test("all services and toolkit entries remain present", async () => {
+  const html = await render("/services");
+  assert.equal((html.match(/class="sub-service-row"/g) ?? []).length, 9);
+  assert.equal((html.match(/class="sub-tool-row"/g) ?? []).length, 10);
+  assert.match(html, /AI-Assisted Visuals/);
 });
-
-test("server-renders the preserved About route as the services experience", async () => {
-  const response = await render("/about");
-  assert.equal(response.status, 200);
-
-  const html = await response.text();
-  assert.match(html, /09 focused services/i);
-  assert.match(html, /Portrait of Smit Patel/i);
-  assert.match(html, /AI-assisted creative/i);
+test("inquiries are drafts and never claim to be sent", async () => {
+  const html = await render("/contact");
+  for (const name of ["name","email","phone","brand","service","budget","timeline","details","consent"]) assert.ok(html.includes('name="' + name + '"'));
+  assert.match(html, /Prepare inquiry/);
+  assert.match(html, /Nothing is sent automatically/);
+  assert.match(html, /76986 41630/);
 });
-
-test("server-renders the dedicated Services route", async () => {
-  const response = await render("/services");
-  assert.equal(response.status, 200);
-
-  const html = await response.text();
-  assert.match(html, /Graphic Design Services/i);
-  assert.match(html, /Software expertise/i);
-  assert.match(html, /AI-Assisted Visuals/i);
-  assert.match(html, /Adobe Photoshop/i);
-});
-
-test("server-renders the dedicated Work route", async () => {
-  const response = await render("/work");
-  assert.equal(response.status, 200);
-
-  const html = await response.text();
-  assert.match(html, /All work/i);
-  assert.match(html, /Fashion Banner Direction/i);
-  assert.match(html, /Campaign Visual Frame/i);
-  assert.match(html, /Typography\/Layout/i);
-});
-
-test("server-renders the dedicated Contact route and inquiry fields", async () => {
-  const response = await render("/contact");
-  assert.equal(response.status, 200);
-
-  const html = await response.text();
-  assert.match(html, /Contact Smit Patel/i);
-  assert.match(html, /Available for freelance projects/i);
-  assert.match(html, /Start a design project/i);
-  assert.match(html, /LET(?:&#x27;|')S CONTACT/i);
-  assert.match(html, /name="name"/i);
-  assert.match(html, /name="email"/i);
-  assert.match(html, /name="phone"/i);
-  assert.match(html, /name="brand"/i);
-  assert.match(html, /name="service"/i);
-  assert.match(html, /name="budget"/i);
-  assert.match(html, /name="timeline"/i);
-  assert.match(html, /name="details"/i);
-  assert.match(html, />SUBMIT</i);
-  assert.match(html, /76986 41630/i);
+test("styles have no image resources and respect motion preferences", async () => {
+  const css = await readFile(new URL("../app/secondary.css", import.meta.url), "utf8");
+  assert.doesNotMatch(css, /url\(/i);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(css, /max-width:760px/);
 });

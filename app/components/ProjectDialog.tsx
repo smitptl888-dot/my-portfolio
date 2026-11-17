@@ -1,103 +1,36 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- Project artwork is local, optimized, and shown without image-service transformations. */
-
 import { useEffect, useRef } from "react";
-import type { Project } from "../portfolio-data";
-
-type ProjectDialogProps = {
-  project: Project | null;
-  nextProject: Project | null;
-  onClose: () => void;
-  onNext: () => void;
-};
-
-export default function ProjectDialog({ project, nextProject, onClose, onNext }: ProjectDialogProps) {
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
-
+import type { GalleryProject } from "../work-gallery-data";
+import imageSizes from "../work-image-sizes.json";
+const dimensions = imageSizes as Record<string, number[]>;
+type Props = { project: GalleryProject | null; nextProject: GalleryProject | null; onClose: () => void; onNext: () => void };
+export default function ProjectDialog({ project, nextProject, onClose, onNext }: Props) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const isOpen = project !== null;
   useEffect(() => {
-    if (!project) return;
-
-    const previousOverflow = document.body.style.overflow;
-    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-
-    function handleKeydown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-      if (event.key === "Tab") {
-        const focusable = Array.from(document.querySelectorAll<HTMLElement>(
-          ".project-dialog button:not([disabled]), .project-dialog a[href]",
-        ));
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first?.focus();
-        }
-      }
-    }
-
-    window.addEventListener("keydown", handleKeydown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeydown);
-      previousFocusRef.current?.focus();
-    };
-  }, [project, onClose]);
-
-  if (!project) return null;
-
-  return (
-    <div className="project-dialog" role="dialog" aria-modal="true" aria-labelledby="project-dialog-title">
-      <button className="dialog-backdrop" type="button" onClick={onClose} aria-label="Close project" />
-      <article className="dialog-panel">
-        <header className="dialog-header">
-          <span>Smit Patel / Selected work</span>
-          <button ref={closeButtonRef} type="button" onClick={onClose}>Close <i aria-hidden="true">×</i></button>
-        </header>
-
-        <div className="dialog-hero">
-          <img src={project.heroImage} alt={project.alt} />
-          <span>{String(project.id).padStart(2, "0")} / {project.category}</span>
-        </div>
-
-        <div className="dialog-copy">
-          <div>
-            <p className="section-kicker">{project.projectType}</p>
-            <h2 id="project-dialog-title">{project.title}</h2>
-          </div>
-          <div className="dialog-overview">
-            <p>{project.description}</p>
-            <dl>
-              <div><dt>Category</dt><dd>{project.category}</dd></div>
-              <div><dt>Services</dt><dd>{project.services.join(" · ")}</dd></div>
-              <div><dt>Toolkit</dt><dd>{project.tools.join(" · ")}</dd></div>
-            </dl>
-          </div>
-        </div>
-
-        <div className="dialog-gallery">
-          {project.gallery.map((image, index) => (
-            <figure key={`${project.slug}-${index}`}>
-              <img src={image} alt={index === 0 ? project.alt : `${project.title} project detail ${index + 1}`} />
-            </figure>
-          ))}
-        </div>
-
-        {nextProject ? (
-          <button className="next-project" type="button" onClick={onNext}>
-            <span>Next project</span>
-            <strong>{nextProject.title}</strong>
-            <i aria-hidden="true">↗</i>
-          </button>
-        ) : null}
-      </article>
-    </div>
-  );
+    const node = dialog.current;
+    if (isOpen) { node?.showModal(); document.body.style.overflow = "hidden"; }
+    else node?.close();
+    return () => { document.body.style.removeProperty("overflow"); };
+  }, [isOpen]);
+  useEffect(() => { if (dialog.current) dialog.current.scrollTop = 0; }, [project?.id]);
+  return <dialog ref={dialog} className="sub-project-dialog" aria-labelledby="project-dialog-title" onClose={onClose}>
+    {project ? <article className="sub-dialog-panel">
+      <header><span>Selected work / {String(project.id).padStart(2, "0")}</span><button type="button" onClick={onClose} aria-label="Close project">Close ×</button></header>
+      <p className="sub-eyebrow">{project.category}</p><h2 id="project-dialog-title">{project.title}</h2>
+      <p className="sub-body-large">{project.description}</p>
+      <p className="sub-collection-note">{project.artworks.length} visuals · {project.collectionNote}</p>
+      <div className="sub-artwork-gallery" aria-label={`${project.title} artwork gallery`}>
+        {project.artworks.map((artwork, index) => <figure key={artwork.src} className="sub-artwork-figure">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={artwork.src} alt={artwork.title} width={dimensions[artwork.src]?.[0]} height={dimensions[artwork.src]?.[1]} loading={index === 0 ? "eager" : "lazy"} decoding="async" />
+          <figcaption><span><b>{String(index + 1).padStart(2, "0")}</b> {artwork.title}{artwork.brand ? ` / ${artwork.brand}` : ""}</span><small className={artwork.provenance === "AI-assisted concept" ? "sub-concept-label" : ""}>{artwork.provenance}</small></figcaption>
+        </figure>)}
+      </div>
+      <dl><div><dt>Services</dt><dd>{project.services.join(" / ")}</dd></div><div><dt>Toolkit</dt><dd>{project.tools.join(" / ")}</dd></div><div><dt>Project type</dt><dd>{project.projectType}</dd></div></dl>
+      <a href="/contact#inquiry" className="sub-text-link" onClick={onClose}>Discuss a similar project <span>↗</span></a>
+      {nextProject && nextProject.id !== project.id ? <button type="button" className="sub-next-project" onClick={onNext}><small>Next project</small><strong>{nextProject.title}</strong><span>→</span></button> : null}
+    </article> : null}
+  </dialog>;
 }

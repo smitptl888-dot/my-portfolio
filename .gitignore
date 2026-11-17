@@ -50,3 +50,7 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+
+# Local audit evidence and generated source/review artifacts (not website assets)
+/audits/
+/output/

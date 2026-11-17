@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Local portfolio artwork is already optimized and must preserve its original crops. */
 
-import Link from "next/link";
+
 import { useEffect, useState, type PointerEvent as ReactPointerEvent } from "react";
 import RadialPosterStage from "./components/RadialPosterStage";
 import SoftwareTube from "./components/SoftwareTube";
@@ -61,7 +61,7 @@ export default function Portfolio() {
         <h1 id="hero-title"><span>SMIT</span><span>PATEL</span></h1>
         <RadialPosterStage />
         <div className="hero-specialties"><span>Design specialist</span><p>Graphic Designer</p><p>Visual Designer</p><p>Creative Direction</p></div>
-        <Link className="hero-contact-card" href="/contact"><span>Hi!<br />I&apos;m Smit.</span><img src="/portfolio/smit-patel-profile-2026.jpg" alt="Smit Patel" /><strong>Contact me<br />for design projects</strong></Link>
+        <a className="hero-contact-card" href="/contact"><span>Hi!<br />I&apos;m Smit.</span><img src="/portfolio/smit-patel-profile-2026.jpg" alt="Smit Patel" /><strong>Contact me<br />for design projects</strong></a>
         <a className="scroll-cue" href="#studio-intro">Scroll Down<i aria-hidden="true">⌄</i></a>
       </section>
 
@@ -97,7 +97,7 @@ export default function Portfolio() {
         <div className="services-intro" data-reveal><p>Design specialties</p><h2>Visual support<br />for every <em>launch.</em></h2></div>
         <div className="services-rows">
           {services.map(([number, title, description]) => (
-            <Link href="/contact" key={title} data-reveal><span>{number}</span><h3>{title}</h3><p>{description}</p><i aria-hidden="true">↗</i><b aria-hidden="true" /></Link>
+            <a href="/contact" key={title} data-reveal><span>{number}</span><h3>{title}</h3><p>{description}</p><i aria-hidden="true">↗</i><b aria-hidden="true" /></a>
           ))}
         </div>
       </section>
@@ -125,7 +125,7 @@ export default function Portfolio() {
         <CornerMarks />
         <div className="about-studio-heading" data-reveal><p>About Smit</p><h2>Designing clear ideas with a bold visual point of view.</h2></div>
         <figure className="about-portrait" data-reveal><img src="/portfolio/smit-patel-profile-2026.jpg" alt="Portrait of Smit Patel, graphic designer" /><figcaption>Smit Patel / Graphic Designer</figcaption></figure>
-        <div className="about-studio-copy" data-reveal><p>Smit creates poster systems, brand visuals, social creatives, and campaign artwork that feels clean, confident, and ready to use.</p><div>{visualSkills.map((skill) => <span key={skill}>{skill}</span>)}</div><Link href="/services">Explore services <i aria-hidden="true">↗</i></Link></div>
+        <div className="about-studio-copy" data-reveal><p>Smit creates poster systems, brand visuals, social creatives, and campaign artwork that feels clean, confident, and ready to use.</p><div>{visualSkills.map((skill) => <span key={skill}>{skill}</span>)}</div><a href="/services">Explore services <i aria-hidden="true">↗</i></a></div>
       </section>
 
       <section className="process-studio" id="process">
@@ -135,7 +135,7 @@ export default function Portfolio() {
 
       <section className="home-contact-cta">
         <CornerMarks />
-        <div className="home-cta-copy"><p>Have a design project in mind?</p><h2>LET&apos;S<br />WORK!</h2><Link href="/contact">Contact <span>↗</span></Link></div>
+        <div className="home-cta-copy"><p>Have a design project in mind?</p><h2>LET&apos;S<br />WORK!</h2><a href="/contact">Contact <span>↗</span></a></div>
         <div className="home-cta-motion" aria-hidden="true"><i /><i /><i /><b>SP</b><span>Graphic design · Visual direction · </span></div>
       </section>
 
@@ -156,11 +156,11 @@ export default function Portfolio() {
           <small aria-hidden="true">CREATIVE PLAYGROUND / 2026</small>
         </div>
         <p>GRAPHIC DESIGNER / VISUAL CREATIVE</p>
-        <nav aria-label="Footer navigation"><Link href="/">Home</Link><i>·</i><Link href="/services">Services</Link><i>·</i><Link href="/work">Work</Link><i>·</i><Link href="/contact">Contact</Link></nav>
+        <nav aria-label="Footer navigation"><a href="/">Home</a><i>·</i><a href="/services">Services</a><i>·</i><a href="/work">Work</a><i>·</i><a href="/contact">Contact</a></nav>
         <small>© 2026 Smit Patel. All rights reserved.</small>
       </footer>
 
-      <Link className="floating-whatsapp" href="/contact" aria-label="Open the contact page"><span>SP</span>Contact</Link>
+      <a className="floating-whatsapp" href="/contact" aria-label="Open the contact page"><span>SP</span>Contact</a>
     </main>
   );
 }

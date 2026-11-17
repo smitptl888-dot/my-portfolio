@@ -18,6 +18,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "audits/**",
+    "output/**",
+    ".tmp/**",
   ]),
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -27,6 +30,10 @@ const eslintConfig = defineConfig([
   jsxA11y.flatConfigs.recommended,
   next.configs["core-web-vitals"],
   {
+    rules: {
+      // Native document navigation avoids the current Vinext RSC Link runtime failure.
+      "@next/next/no-html-link-for-pages": "off",
+    },
     languageOptions: {
       globals: {
         ...globals.browser,

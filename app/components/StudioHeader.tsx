@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+
 import { useEffect, useRef, useState } from "react";
 import { siteDetails } from "../portfolio-data";
 
@@ -74,9 +74,9 @@ export default function StudioHeader({ current }: StudioHeaderProps) {
   return (
     <>
       <header ref={headerRef} className="studio-header" data-surface="dark">
-        <Link className="studio-mark" href="/" onClick={() => setMenuOpen(false)} aria-label="Smit Patel portfolio home"><span>S</span><i /><span>P</span></Link>
+        <a className="studio-mark" href="/" onClick={() => setMenuOpen(false)} aria-label="Smit Patel portfolio home"><span>S</span><i /><span>P</span></a>
         <nav className="studio-nav" aria-label="Primary navigation">
-          {navigation.map(([id, label, href]) => <Link key={id} href={href} aria-current={current === id ? "page" : undefined}>{label}</Link>)}
+          {navigation.map(([id, label, href]) => <a key={id} href={href} aria-current={current === id ? "page" : undefined}>{label}</a>)}
         </nav>
         <button className="studio-menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="studio-mobile-menu" onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? "Close" : "Menu"}</button>
       </header>
@@ -85,7 +85,7 @@ export default function StudioHeader({ current }: StudioHeaderProps) {
         <p>Smit Patel / Visual Designer</p>
         <nav aria-label="Mobile navigation">
           {navigation.map(([id, label, href], index) => (
-            <Link key={id} href={href} aria-current={current === id ? "page" : undefined} onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}><span>0{index + 1}</span>{label}<i aria-hidden="true">↗</i></Link>
+            <a key={id} href={href} aria-current={current === id ? "page" : undefined} onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}><span>0{index + 1}</span>{label}<i aria-hidden="true">↗</i></a>
           ))}
         </nav>
         <div><a href={siteDetails.instagramUrl} target="_blank" rel="noreferrer" tabIndex={menuOpen ? 0 : -1}>Instagram ↗</a><a href={`mailto:${siteDetails.email}`} tabIndex={menuOpen ? 0 : -1}>Email ↗</a></div>

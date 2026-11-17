@@ -1,70 +1,20 @@
+import { contactEmail } from "../contact-settings";
+import { MotionProvider } from "../components/MotionProvider";
 import type { Metadata } from "next";
-import Link from "next/link";
 import InquiryForm from "../components/InquiryForm";
-import RevealObserver from "../components/RevealObserver";
-import StudioHeader from "../components/StudioHeader";
+import StudioHeader from "../components/PageHeader";
+import { Marquee, SectionLabel, StudioFooter } from "../components/StudioElements";
 import { siteDetails } from "../portfolio-data";
-
-/* eslint-disable @next/next/no-img-element -- The local portrait is optimized and displayed at its intended crop. */
-
-export const metadata: Metadata = {
-  title: "Contact Smit Patel | Graphic Design Inquiry",
-  description: "Contact Smit Patel for poster design, social media creatives, brand identity, campaign visuals, digital ads, and print-ready design.",
-};
-
+export const metadata: Metadata = { title: "Contact Smit Patel | Graphic Design Inquiry", description: "Start a design project with Smit Patel. Posters, brand identity, social creatives, and campaign visuals." };
 export default function ContactPage() {
-  return (
-    <main className="mondragon-portfolio contact-page">
-      <RevealObserver />
-      <StudioHeader current="contact" />
-      <section className="contact-experience-hero" aria-labelledby="contact-title">
-        <span className="corner-marks" aria-hidden="true"><i /><i /><i /><i /></span>
-        <p>Graphic designer / Visual creative</p>
-        <h1 id="contact-title" aria-label="Let's Contact">
-          <span aria-hidden="true">LET&apos;S CONTACT</span>
-          <span aria-hidden="true">LET&apos;S CONTACT</span>
-          <span aria-hidden="true">LET&apos;S CONTACT</span>
-          <strong>LET&apos;S CONTACT</strong>
-        </h1>
-        <Link className="contact-hero-person" href={`mailto:${siteDetails.email}`}>
-          <img src="/portfolio/smit-patel-portrait.png" alt="Smit Patel" />
-          <span>Hi!<br />I&apos;m Smit.</span>
-          <strong>Email me <i aria-hidden="true">↗</i></strong>
-        </Link>
-        <div className="contact-hero-meta"><span>Start a design project</span><span>Scroll to inquire ↓</span></div>
-      </section>
-
-      <section className="contact-experience-content">
-        <div className="contact-information">
-          <p className="contact-kicker" data-reveal>Direct contact / Smit Patel</p>
-          <h2>{siteDetails.location}</h2>
-          <dl>
-            <div><dt>Email</dt><dd><a href={`mailto:${siteDetails.email}`}>{siteDetails.email}</a></dd></div>
-            <div><dt>Phone / WhatsApp</dt><dd><a href={`tel:${siteDetails.phoneHref}`}>{siteDetails.phoneDisplay}</a></dd></div>
-            <div><dt>Instagram</dt><dd><a href={siteDetails.instagramUrl} target="_blank" rel="noreferrer">@smit8._ ↗</a></dd></div>
-          </dl>
-          <a className="contact-manager-card" href={siteDetails.whatsappUrl} target="_blank" rel="noreferrer" data-reveal>
-            <img src="/portfolio/smit-patel-portrait.png" alt="Smit Patel" />
-            <span>Hi!<br />I&apos;m Smit.</span>
-            <strong>Message me<br />on WhatsApp <i>↗</i></strong>
-          </a>
-          <div className="contact-scope">
-            <p>Good starting details</p>
-            <span>What you need</span><span>Where it will be used</span><span>Timeline and budget</span><span>Reference direction</span>
-          </div>
-        </div>
-        <div className="contact-form-column" data-reveal>
-          <p className="contact-form-intro">Have a project idea, need campaign visuals, or want to build a stronger design system? Share the essentials and let&apos;s start the conversation.</p>
-          <InquiryForm />
-        </div>
-      </section>
-
-      <footer className="contact-page-footer">
-        <strong>SMIT PATEL</strong>
-        <p>GRAPHIC DESIGNER / VISUAL CREATIVE</p>
-        <nav aria-label="Contact page footer navigation"><Link href="/">Home</Link><Link href="/services">Services</Link><Link href="/work">Work</Link><Link href="/contact">Contact</Link></nav>
-        <small>© 2026 Smit Patel. All rights reserved.</small>
-      </footer>
-    </main>
-  );
+  return <MotionProvider><StudioHeader current="contact" /><main id="main-content" tabIndex={-1}>
+    <section className="sub-page-hero sub-contact-hero"><p className="sub-eyebrow">Start a design project</p><h1>LET&apos;S<br /><em>CONTACT.</em></h1><div className="sub-page-hero-bottom"><span className="sub-availability"><i />{siteDetails.location}</span><p>Have a project idea, need campaign visuals, or want to build a stronger design system?</p><a href="#inquiry">Tell me about it ↓</a></div></section>
+    <Marquee text="LET'S WORK — LET'S CREATE — LET'S CONTACT — " />
+    <section className="sub-section sub-contact-content sub-paper-section" id="inquiry"><div className="sub-contact-information"><SectionLabel number="01">Start a conversation</SectionLabel><h2 className="sub-display-heading">HI!<br />I&apos;M <em>SMIT.</em></h2><p className="sub-body-large">Share the essentials and let&apos;s start the conversation.</p><dl>
+      {contactEmail ? <div><dt>Email</dt><dd><a href={`mailto:${contactEmail}`}>{contactEmail}</a></dd></div> : null}
+      <div><dt>Phone</dt><dd><a href={`tel:${siteDetails.phoneHref}`}>{siteDetails.phoneDisplay}</a></dd></div>
+      <div><dt>WhatsApp</dt><dd><a href={siteDetails.whatsappUrl} target="_blank" rel="noreferrer">Message me ↗</a></dd></div>
+      <div><dt>Instagram</dt><dd><a href={siteDetails.instagramUrl} target="_blank" rel="noreferrer">@smit8._ ↗</a></dd></div>
+    </dl><p className="sub-contact-scope">Good starting details: what you need, where it will be used, your timeline and budget, and any reference direction.</p></div><InquiryForm /></section>
+  </main><StudioFooter /></MotionProvider>;
 }
