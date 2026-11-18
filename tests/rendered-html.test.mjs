@@ -79,3 +79,15 @@ test("styles have no image resources and respect motion preferences", async () =
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /max-width:760px/);
 });
+
+test("homepage software logos are local, valid SVGs and require no icon API", async () => {
+  const html = await render("/");
+  assert.doesNotMatch(html, /api\.iconify\.design/);
+  for (const name of ["photoshop", "illustrator", "lightroom", "figma", "canva", "indesign", "premiere", "after-effects", "wordpress", "filmora"]) {
+    assert.ok(html.includes(`/software/${name}.svg`), name);
+    const svg = await readFile(new URL(`../public/software/${name}.svg`, import.meta.url), "utf8");
+    assert.match(svg, /<svg\b/);
+    assert.match(svg, /viewBox="0 0 [1-9]/);
+    assert.doesNotMatch(svg, /<script|<image|https?:\/\/(?!www\.w3\.org)/);
+  }
+});

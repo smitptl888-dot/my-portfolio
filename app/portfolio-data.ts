@@ -93,16 +93,16 @@ export const services = [
 ] as const;
 
 export const toolkit = [
-  ["Ps", "Adobe Photoshop", "Image editing and campaign artwork", "https://api.iconify.design/logos:adobe-photoshop.svg", "#31a8ff"],
-  ["Ai", "Adobe Illustrator", "Vector graphics and identity systems", "https://api.iconify.design/logos:adobe-illustrator.svg", "#ff9a00"],
-  ["Lr", "Adobe Lightroom", "Color refinement and photo finishing", "https://api.iconify.design/logos:adobe-lightroom.svg", "#31a8ff"],
-  ["Fi", "Figma", "Layouts and collaborative visual systems", "https://api.iconify.design/logos:figma.svg", "#f24e1e"],
-  ["C", "Canva Pro", "Fast, consistent social variations", "https://api.iconify.design/logos:canva-icon.svg", "#00c4cc"],
-  ["Id", "Adobe InDesign", "Editorial and print-ready layouts", "https://api.iconify.design/logos:adobe-indesign.svg", "#ff3366"],
-  ["Pr", "Adobe Premiere Pro", "Video edits and motion sequences", "https://api.iconify.design/logos:adobe-premiere.svg", "#9999ff"],
-  ["Ae", "After Effects", "Motion graphics and animated details", "https://api.iconify.design/logos:adobe-after-effects.svg", "#9999ff"],
-  ["Wp", "WordPress", "Visual website publishing", "https://api.iconify.design/logos:wordpress-icon.svg", "#21759b"],
-  ["Fl", "Filmora", "Fast video edits and exports", "https://api.iconify.design/simple-icons:wondersharefilmora.svg?color=%2300e4d4", "#00e4d4"],
+  ["Ps", "Adobe Photoshop", "Image editing and campaign artwork", "/software/photoshop.svg", "#31a8ff"],
+  ["Ai", "Adobe Illustrator", "Vector graphics and identity systems", "/software/illustrator.svg", "#ff9a00"],
+  ["Lr", "Adobe Lightroom", "Color refinement and photo finishing", "/software/lightroom.svg", "#31a8ff"],
+  ["Fi", "Figma", "Layouts and collaborative visual systems", "/software/figma.svg", "#f24e1e"],
+  ["C", "Canva Pro", "Fast, consistent social variations", "/software/canva.svg", "#00c4cc"],
+  ["Id", "Adobe InDesign", "Editorial and print-ready layouts", "/software/indesign.svg", "#ff3366"],
+  ["Pr", "Adobe Premiere Pro", "Video edits and motion sequences", "/software/premiere.svg", "#9999ff"],
+  ["Ae", "After Effects", "Motion graphics and animated details", "/software/after-effects.svg", "#9999ff"],
+  ["Wp", "WordPress", "Visual website publishing", "/software/wordpress.svg", "#21759b"],
+  ["Fl", "Filmora", "Fast video edits and exports", "/software/filmora.svg", "#00e4d4"],
 ] as const;
 
 export const visualSkills = [

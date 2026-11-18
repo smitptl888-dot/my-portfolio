@@ -2231,3 +2231,30 @@ footer > p { grid-column: 1 / -1; margin: 55px 0 0; }
     animation: none !important;
   }
 }
+
+/* Keep vertical browser gestures available around the interactive artwork. */
+.home-focused .radial-poster-stage,
+.home-focused .software-tube { touch-action: pan-y pinch-zoom; }
+.home-focused .opening-sequence { pointer-events: none; }
+.home-focused .software-tube-item > div { min-width: 0; }
+.home-focused .software-tube-item h3 { line-height: 1.08; }
+.home-focused .software-tube-item p { line-height: 1.4; }
+@media (max-width: 760px) {
+  .home-focused .software-heading h2 { line-height: .92; letter-spacing: -.055em; font-size: clamp(36px, 14vw, 82px); }
+  .home-focused .software-tube { height: 520px; perspective: 850px; }
+  .home-focused .software-tube-item { height: 92px; grid-template-columns: 22px 50px minmax(0,1fr) 6px; gap: 9px; padding-inline: 10px; }
+  .home-focused .software-tube-item h3 { font-size: clamp(18px, 5.2vw, 27px); letter-spacing: -.035em; }
+  .home-focused .software-tube-item p { font-size: 9px; }
+  .home-focused .software-tube-caption { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-focused .software-tube { height: auto; touch-action: auto; }
+}
+
+/* Only transform/opacity are animated: avoid per-frame rasterization on phones. */
+.home-focused .software-tube { perspective: none; contain: layout paint; }
+.home-focused .software-tube-list { transform-style: flat; }
+.home-focused .software-tube-item { will-change: transform, opacity; }
+.home-focused .software-showcase::before { display: none; }
+.home-focused .software-tube-icon { box-shadow: none; }
+.home-focused .software-tube-icon img { inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); }

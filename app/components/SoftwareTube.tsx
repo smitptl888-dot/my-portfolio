@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- Product marks are loaded from the established Iconify logo sources. */
+/* eslint-disable @next/next/no-img-element -- Small local SVG product logos. */
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { toolkit } from "../portfolio-data";
@@ -15,6 +15,7 @@ export default function SoftwareTube() {
     const rows = Array.from(tube.querySelectorAll<HTMLElement>("[data-software-tube-item]"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let height = tube.clientHeight;
+    let spacing = (rows[0]?.offsetHeight ?? 108) + 10;
     let visible = true;
     let frame = 0;
     let last = performance.now();
@@ -22,12 +23,12 @@ export default function SoftwareTube() {
     let dragging = false;
     let activePointer = -1;
     let lastPointerY = 0;
+    let touchPointer = false;
     let lastPointerTime = 0;
     let velocity = 0;
     let announcedTool = 1;
 
     const dimensions = () => {
-      const spacing = height < 520 ? 92 : 118;
       return { spacing, cycle: spacing * rows.length };
     };
 
@@ -35,10 +36,11 @@ export default function SoftwareTube() {
     const clampVelocity = (value: number) => Math.max(-1.25, Math.min(1.25, value));
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (!event.isPrimary || event.button !== 0) return;
+      if (reducedMotion || !event.isPrimary || event.button !== 0) return;
+      touchPointer = event.pointerType === "touch";
       dragging = true;
       activePointer = event.pointerId;
-      lastPointerY = event.clientY;
+      lastPointerY = touchPointer ? event.clientX : event.clientY;
       lastPointerTime = performance.now();
       velocity = 0;
       tube.setPointerCapture(event.pointerId);
@@ -49,11 +51,12 @@ export default function SoftwareTube() {
       if (!dragging || event.pointerId !== activePointer) return;
       const now = performance.now();
       const elapsed = Math.max(now - lastPointerTime, 8);
-      const delta = event.clientY - lastPointerY;
+      const coordinate = touchPointer ? event.clientX : event.clientY;
+      const delta = coordinate - lastPointerY;
       const { cycle } = dimensions();
       offset = wrapOffset(offset - delta, cycle);
       velocity = clampVelocity(-delta / elapsed);
-      lastPointerY = event.clientY;
+      lastPointerY = coordinate;
       lastPointerTime = now;
     };
 
@@ -65,15 +68,8 @@ export default function SoftwareTube() {
       delete tube.dataset.dragging;
     };
 
-    const handleWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      const { cycle } = dimensions();
-      offset = wrapOffset(offset + event.deltaY * 0.55, cycle);
-      velocity = clampVelocity(event.deltaY * 0.018);
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!["ArrowUp", "ArrowDown", "Home"].includes(event.key)) return;
+      if (reducedMotion || !["ArrowUp", "ArrowDown", "Home"].includes(event.key)) return;
       event.preventDefault();
       const { spacing, cycle } = dimensions();
       offset = event.key === "Home"
@@ -82,15 +78,29 @@ export default function SoftwareTube() {
       velocity = 0;
     };
 
-    const resizeObserver = new ResizeObserver(() => { height = tube.clientHeight; });
-    const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    const resizeObserver = new ResizeObserver(() => {
+      height = tube.clientHeight;
+      spacing = (rows[0]?.offsetHeight ?? 108) + 10;
+    });
+    const syncAnimation = () => {
+      cancelAnimationFrame(frame);
+      if (visible && !document.hidden && !reducedMotion) {
+        last = performance.now();
+        frame = requestAnimationFrame(render);
+      }
+    };
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      syncAnimation();
+    });
+    document.addEventListener("visibilitychange", syncAnimation);
     resizeObserver.observe(tube);
     visibilityObserver.observe(tube);
     tube.addEventListener("pointerdown", handlePointerDown);
     tube.addEventListener("pointermove", handlePointerMove);
     tube.addEventListener("pointerup", finishPointer);
     tube.addEventListener("pointercancel", finishPointer);
-    tube.addEventListener("wheel", handleWheel, { passive: false });
+    tube.addEventListener("lostpointercapture", finishPointer);
     tube.addEventListener("keydown", handleKeyDown);
 
     const removeInteractionListeners = () => {
@@ -98,7 +108,8 @@ export default function SoftwareTube() {
       tube.removeEventListener("pointermove", handlePointerMove);
       tube.removeEventListener("pointerup", finishPointer);
       tube.removeEventListener("pointercancel", finishPointer);
-      tube.removeEventListener("wheel", handleWheel);
+      tube.removeEventListener("lostpointercapture", finishPointer);
+      document.removeEventListener("visibilitychange", syncAnimation);
       tube.removeEventListener("keydown", handleKeyDown);
     };
 
@@ -111,7 +122,7 @@ export default function SoftwareTube() {
       };
     }
 
-    const render = (now: number) => {
+    function render(now: number) {
       const elapsed = Math.min(now - last, 40);
       last = now;
 
@@ -126,7 +137,7 @@ export default function SoftwareTube() {
         const activeTool = (Math.round(offset / spacing) % rows.length) + 1;
         if (activeTool !== announcedTool) {
           announcedTool = activeTool;
-          tube.setAttribute("aria-valuenow", String(activeTool));
+          tube?.setAttribute("aria-valuenow", String(activeTool));
         }
 
         rows.forEach((row, index) => {
@@ -135,17 +146,13 @@ export default function SoftwareTube() {
           const centerDistance = (y + spacing * 0.5 - height * 0.5) / (height * 0.5);
           const depth = Math.max(0, 1 - Math.abs(centerDistance));
           const scale = 0.76 + depth * 0.24;
-          const rotateX = centerDistance * -20;
-
-          row.style.zIndex = String(Math.round(depth * 100));
-          row.style.opacity = String(0.2 + depth * 0.8);
-          row.style.filter = `blur(${Math.max(0, Math.abs(centerDistance) - 0.68) * 4}px)`;
-          row.style.transform = `translate3d(0, ${y}px, ${depth * 90}px) scale(${scale}) rotateX(${rotateX}deg)`;
+          row.style.opacity = String(0.55 + depth * 0.45);
+          row.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
         });
       }
 
       frame = requestAnimationFrame(render);
-    };
+    }
 
     frame = requestAnimationFrame(render);
     return () => {
@@ -160,7 +167,7 @@ export default function SoftwareTube() {
     <div
       className="software-tube"
       ref={tubeRef}
-      aria-label="Software expertise. Drag, swipe, scroll, or use arrow keys to explore the tools."
+      aria-label="Software expertise. Drag vertically with a mouse, swipe sideways on touch, or use arrow keys. Scroll vertically to continue down the page."
       aria-controls="software-tube-list"
       aria-orientation="vertical"
       aria-roledescription="draggable software loop"
@@ -182,8 +189,7 @@ export default function SoftwareTube() {
           >
             <span className="software-tube-index">{String(index + 1).padStart(2, "0")}</span>
             <span className="software-tube-icon" aria-hidden="true">
-              <b>{mark}</b>
-              {icon ? <img src={icon} alt="" loading="lazy" /> : null}
+              {icon ? <img src={icon} alt="" width={48} height={48} decoding="async" /> : <b>{mark}</b>}
             </span>
             <div><h3>{name}</h3><p>{detail}</p></div>
             <i aria-hidden="true" />
