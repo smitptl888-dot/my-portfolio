@@ -35,7 +35,7 @@ export default function ProjectDialog({ project, nextProject, onClose, onNext }:
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={artwork.src} alt={artwork.title} width={dimensions[artwork.src]?.[0]} height={dimensions[artwork.src]?.[1]} loading={index === 0 ? "eager" : "lazy"} decoding="async" />
           </div>
-          <figcaption><span><b>{String(index + 1).padStart(2, "0")}</b> {artwork.title}{artwork.brand ? ` / ${artwork.brand}` : ""}</span><small className={artwork.provenance === "AI-assisted concept" ? "sub-concept-label" : ""}>{artwork.provenance}</small></figcaption>
+          <figcaption><span><b>{String(index + 1).padStart(2, "0")}</b> {artwork.title}{artwork.brand ? ` / ${artwork.brand}` : ""}</span><small>{artwork.provenance}</small></figcaption>
         </figure>)}
       </div>
       <p className="sub-collection-note work-gallery-provenance">{project.collectionNote}</p>

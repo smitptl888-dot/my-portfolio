@@ -143,3 +143,12 @@
 }
 
 .secondary-site .project-index .sub-project-entry:is(:hover,:focus-visible) { background:transparent; }
+
+@media (max-width:760px) {
+ .secondary-site .work-gallery-dialog .work-gallery-title { padding-top:0; padding-right:40px; }
+ .secondary-site .work-gallery-dialog .work-gallery-title>span { left:auto; right:0; font-size:34px; }
+ .secondary-site .work-gallery-dialog .work-gallery-title h2 { font-size:clamp(30px,8.5vw,58px); overflow-wrap:anywhere; }
+ .secondary-site .work-gallery-dialog .work-gallery-summary { padding-bottom:20px; }
+ .secondary-site .work-gallery-dialog .work-gallery-summary>span { display:none; }
+ .secondary-site .work-gallery-dialog .work-artwork-mount { padding:12px; background:#1b1b1b; border-color:#444; }
+}

@@ -55,7 +55,7 @@ export default function RadialPosterStage() {
       <a href={`/work?category=${encodeURIComponent(category)}#project-index`} aria-label={`Explore ${category}`} onPointerDown={event => { touch.current = event.pointerType !== "mouse"; }} onClick={event => { if (touch.current && selected !== i) { event.preventDefault(); setSelected(i); } }} onBlur={() => setSelected(null)}>
         {/* Approved concept artwork, kept separate from existing client projects. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`/portfolio/work-concepts/${artwork[i]}.jpg`} alt={`${title.replace("\n", " ")} — Smit Patel concept study ${number}`} width={810} height={1080} decoding="async" fetchPriority={i === 0 ? "high" : "auto"} draggable={false} />
+        <img src={`/portfolio/work-concepts/${artwork[i]}-v2.jpg`} alt={`${title.replace("\n", " ")} — Smit Patel concept study ${number}`} width={810} height={1080} decoding="async" fetchPriority={i === 0 ? "high" : "auto"} draggable={false} />
         <span className="sub-poster-caption">{category}<b>{number} ↗</b></span>
       </a>
     </div>)}

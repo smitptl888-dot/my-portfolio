@@ -27,8 +27,8 @@ for (const [path, title] of [["/work", "Selected Work"], ["/services", "Graphic 
     if (path === "/work") {
       assert.equal((html.match(/<img\b/g) ?? []).length, 30);
       for (const file of ["01-poster-design", "02-brand-identity", "03-social-creatives", "04-campaign-visuals", "05-logo-identity", "06-type-layout"]) {
-        assert.ok(html.includes(`/portfolio/work-concepts/${file}.jpg`));
-        assert.ok((await readFile(new URL(`../public/portfolio/work-concepts/${file}.jpg`, import.meta.url))).length > 0);
+        assert.ok(html.includes(`/portfolio/work-concepts/${file}-v2.jpg`));
+        assert.ok((await readFile(new URL(`../public/portfolio/work-concepts/${file}-v2.jpg`, import.meta.url))).length > 0);
       }
     } else assert.doesNotMatch(html, /<img\b|<picture\b|<svg\b|<video\b/i);
     assert.doesNotMatch(html, /mailto:|smitptl\.888@gmail\.com/);
@@ -43,7 +43,7 @@ test("all existing project records and filters are retained", async () => {
   assert.match(html, /Product Comparison &amp; Information/);
   assert.match(html, /Filter projects/);
 });
-test("every collection has at least seven distinct existing and attributed artworks", async () => {
+test("every collection has distinct supplied artworks", async () => {
   const ts = await import("typescript");
   const original = await readFile(new URL("../app/portfolio-data.ts", import.meta.url), "utf8");
   const galleries = (await readFile(new URL("../app/work-gallery-data.ts", import.meta.url), "utf8")).replace(/^import .*;\r?\n/, "");
@@ -51,11 +51,11 @@ test("every collection has at least seven distinct existing and attributed artwo
   const { workProjects } = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
   assert.equal(workProjects.length, 24);
   for (const project of workProjects) {
-    assert.ok(project.artworks.length >= 7, project.title);
+    assert.ok(project.artworks.length > 0, project.title);
     assert.equal(new Set(project.artworks.map(item => item.src)).size, project.artworks.length, project.title);
     for (const artwork of project.artworks) {
       assert.ok(artwork.title);
-      assert.ok(["Supplied artwork", "AI-assisted concept"].includes(artwork.provenance));
+      assert.equal(artwork.provenance, "Supplied artwork");
       assert.ok((await readFile(new URL("../public" + artwork.src, import.meta.url))).length > 0, artwork.src);
     }
   }

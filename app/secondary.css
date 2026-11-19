@@ -364,3 +364,10 @@
 }
 .secondary-site[data-motion=paused] { scroll-behavior:auto; }
 .secondary-site[data-motion=paused] *,.secondary-site[data-motion=paused] *::before,.secondary-site[data-motion=paused] *::after { animation-play-state:paused !important; transition:none !important; }
+
+@media (max-width:760px) {
+ .secondary-site .sub-page-hero:not(.sub-work-hero) { min-height:0; padding-block:42px 32px; }
+ .secondary-site .sub-page-hero:not(.sub-work-hero) h1 { font-size:clamp(42px,15vw,106px); margin:42px 0 38px; line-height:.87; }
+ .secondary-site .sub-page-hero:not(.sub-work-hero) .sub-page-hero-bottom { border-top:1px solid var(--line); padding-top:22px; gap:14px; }
+ .secondary-site .sub-page-hero-bottom>a { min-height:44px; display:inline-flex; align-items:center; color:var(--accent); }
+}
