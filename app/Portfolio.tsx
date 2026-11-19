@@ -17,12 +17,6 @@ export default function Portfolio() {
   const [introVisible, setIntroVisible] = useState(true);
 
   useEffect(() => {
-    // Animation events can be dropped when mobile browsers background a tab.
-    const timer = window.setTimeout(() => setIntroVisible(false), 2200);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
       document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((element) => element.setAttribute("data-visible", "true"));

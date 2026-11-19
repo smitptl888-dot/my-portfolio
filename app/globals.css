@@ -2236,7 +2236,6 @@ footer > p { grid-column: 1 / -1; margin: 55px 0 0; }
 /* Keep vertical browser gestures available around the interactive artwork. */
 .home-focused .radial-poster-stage,
 .home-focused .software-tube { touch-action: pan-y pinch-zoom; }
-.home-focused .opening-sequence { pointer-events: none; }
 .home-focused .software-tube-item > div { min-width: 0; }
 .home-focused .software-tube-item h3 { line-height: 1.08; }
 .home-focused .software-tube-item p { line-height: 1.4; }
