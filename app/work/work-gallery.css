@@ -139,8 +139,13 @@
 .secondary-site .project-index .sub-filter-list a[aria-current=true]::before { background:#b7371c; border-color:#b7371c; }
 .secondary-site .project-index .sub-filter-list a:focus-visible { outline:2px solid #b7371c; outline-offset:2px; }
 .secondary-site .project-index .sub-filter-list a:active { background:#edd9cd; border-bottom-color:#b7371c; }
-@media (hover:hover) {
- .secondary-site .project-index .sub-filter-list a:not([aria-current=true]):hover { background:#e9e4da; border-bottom-color:#938b7c; }
+@media (min-width:761px) and (hover:hover) and (pointer:fine) {
+ .secondary-site .project-index .sub-filter-list a:not([aria-current=true]):hover {
+  background:#e9e4da; color:#151515; border-bottom-color:#938b7c;
+ }
+ .secondary-site .project-index .sub-filter-list a[aria-current=true]:hover {
+  background:#f6e4d9; color:#8c2b17;
+ }
 }
 .secondary-site .project-index .sub-project-grid { padding:clamp(30px,5vw,78px) var(--gutter); border:0; column-gap:clamp(24px,5vw,84px); row-gap:clamp(38px,6vw,96px); align-items:start; }
 .secondary-site .project-index .sub-project-entry { min-width:0; padding:0; border:0; min-height:0; background:none; color:var(--paper); }

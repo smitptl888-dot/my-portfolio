@@ -53,8 +53,8 @@ export default function MobileMenu({ current }: { current?: string }) {
       <div className="studio-navigation-inner">
         <div className="studio-navigation-top"><a href="/" aria-label="Smit Patel home">S<span>—</span>P</a><button type="button" onClick={close} aria-label="Close menu">Close <span aria-hidden="true">×</span></button></div>
         <div className="studio-navigation-intro"><span>SMIT PATEL / VISUAL DESIGNER</span></div>
-        <nav aria-label="Mobile navigation">{links.map(([key, label, href], index) => <a href={href} key={key} aria-current={key === current ? "page" : undefined}><small aria-hidden="true">0{index + 1}</small><span>{label}</span><i aria-hidden="true">↗</i></a>)}</nav>
-        <div className="studio-navigation-bottom"><span>GRAPHIC DESIGN<br />& VISUAL DIRECTION</span><a href="/contact">Have an idea?<br /><em>Let’s create.</em> ↗</a></div>
+        <nav aria-label="Mobile navigation">{links.map(([key, label, href], index) => <a href={href} key={key} aria-current={key === current ? "page" : undefined}><small aria-hidden="true">0{index + 1}</small><span>{label}</span></a>)}</nav>
+        <div className="studio-navigation-bottom"><span>GRAPHIC DESIGN<br />& VISUAL DIRECTION</span><a href="/contact">Have an idea?<br /><em>Let’s create.</em></a></div>
       </div>
     </dialog>
   </>;

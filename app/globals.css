@@ -741,7 +741,7 @@ footer > p { grid-column: 1 / -1; margin: 55px 0 0; }
   .mondragon-portfolio [data-reveal] { transform: translateY(25px); }
   .opening-logo { top: 25px; left: 24px; }
   .opening-sequence > p { right: 24px; bottom: 24px; font-size: 8px; }
-  .opening-word { flex-direction: column; gap: .05em; font-size: 28vw; line-height: .62; }
+  .opening-word { flex-direction: column; gap: 0; font-size: min(26vw, 25dvh); line-height: .92; padding: .08em .04em; }
   .studio-header { height: 70px; padding-inline: 24px; }
   .studio-mark { font-size: 24px; }
   .studio-mark i { width: 45px; }
@@ -790,7 +790,8 @@ footer > p { grid-column: 1 / -1; margin: 55px 0 0; }
   .services-intro { grid-template-columns: 1fr; gap: 30px; margin-bottom: 50px; }
   .services-intro > p { font-size: 17px; }
   .services-intro h2 { font-size: clamp(58px, 18vw, 82px); }
-  .services-rows > a { grid-template-columns: 35px 1fr 24px; min-height: 100px; gap: 10px; }
+  .services-rows > a { grid-template-columns: 35px minmax(0, 1fr); min-height: 100px; gap: 10px; }
+  .services-rows > a > i { display: none; }
   .services-rows h3 { font-size: clamp(24px, 8vw, 38px); }
   .services-rows p, .services-rows img { display: none; }
   .proof-strip { grid-template-columns: 1fr; gap: 11px; padding: 85px 24px; }
