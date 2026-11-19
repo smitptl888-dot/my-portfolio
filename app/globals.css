@@ -741,7 +741,7 @@ footer > p { grid-column: 1 / -1; margin: 55px 0 0; }
   .mondragon-portfolio [data-reveal] { transform: translateY(25px); }
   .opening-logo { top: 25px; left: 24px; }
   .opening-sequence > p { right: 24px; bottom: 24px; font-size: 8px; }
-  .opening-word { flex-direction: column; gap: .05em; font-size: 28vw; line-height: .62; overflow: visible; clip-path: inset(-.18em 0 0); }
+  .opening-word { flex-direction: column; gap: .05em; font-size: 28vw; line-height: .62; }
   .studio-header { height: 70px; padding-inline: 24px; }
   .studio-mark { font-size: 24px; }
   .studio-mark i { width: 45px; }
